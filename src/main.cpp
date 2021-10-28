@@ -5,7 +5,7 @@ Servo myServo;
 //lasor int:
 const int PhotoIn = 2; //input pin for Photomicrosensor
 const int LED = 13; //output pin for LED
-int State = 0; //a variable to read the encoder state
+int State = LOW; //a variable to read the encoder state
 
 void setup() {
 //Servo set up:
@@ -24,16 +24,15 @@ void loop() {
 State = digitalRead(PhotoIn);
 
 if (State == HIGH) {  //if the encoder output is in a high logical state
-digitalWrite(LED, HIGH); //turn the LED on
 Serial.println("Broken");
-myServo.write(120); //angle 180
+myServo.write(100); //angle 180
 delay(1000);
 myServo.write(0);
 delay(1000);
 }
 
 else {
-digitalWrite(LED, LOW); //turn the LED off
 Serial.println("rokenB");
+myServo.write(0);
 }
 }
