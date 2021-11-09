@@ -1,38 +1,55 @@
 #include <Arduino.h>
+// include the Servo library
 #include <Servo.h>
-Servo myServo;
+
+//servo int
+Servo myServo;  // create a servo object
+int servoAngle=0; // variable to hold the angle for the servo motor
 
 //lasor int:
-const int PhotoIn = 2; //input pin for Photomicrosensor
-const int LED = 13; //output pin for LED
-int State = LOW; //a variable to read the encoder state
+int photoSensorPin=2;
+int photoSensorVal=0;
+int previousPhotosState=0;
 
 void setup() {
-//Servo set up:
-myServo.attach(9); //attack servo's pin
-myServo.write(0); //that's a starting angle
-delay(1000);
-
-//LasorSetUp:
-pinMode(PhotoIn, INPUT); //set pin 2 as input
-pinMode(LED, OUTPUT); //set pin 13 as output 
-Serial.begin(9600);
+  Serial.begin(9600); // open a serial connection to your computer
+  myServo.attach(9); // attaches the servo on pin 9 to the servo object
+  
 }
 
 void loop() {
+
+int currentPhotosState = analogRead(photoSensorPin);
   
-State = digitalRead(PhotoIn);
+  // servo motor
+   myServo.write(servoAngle);
+   Serial.print("Servo angle:");
+   Serial.println(servoAngle);
 
-if (State == HIGH) {  //if the encoder output is in a high logical state
-Serial.println("Broken");
-myServo.write(100); //angle 180
-delay(1000);
-myServo.write(0);
-delay(1000);
+   // laser
+   photoSensorVal= analogRead(photoSensorPin);
+   Serial.print("Photosensor: ");
+   Serial.println(photoSensorVal);
+
+if (previousPhotosState==0&&currentPhotosState>500) {  
+    
+    Serial.println("accepted");
+  // set the servo position
+   servoAngle=120;
+   myServo.write(servoAngle);
+   delay(1000); //DELAY TO REPLACE
+   //accepted==true;
+   servoAngle=0;
+   myServo.write(servoAngle);
+   delay(2000); //DELAY TO REPLACE
 }
 
-else {
-Serial.println("rokenB");
-myServo.write(0);
+else if (previousPhotosState>500){
+    
+    Serial.println("declined");
+    servoAngle=0;
+    myServo.write(servoAngle);
 }
+
+previousPhotosState = currentPhotosState;
 }
