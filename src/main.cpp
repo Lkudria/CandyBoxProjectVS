@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include <runtimer.h>
+#include <Flasher.h>
+ 
+Flasher flasher (1,2,3,4,5,6,7);
 
 #define photoSensorPin 2             // photo Sensor on I/O pin 2
 #define servoMotorPin 9              // servo motor control on I/O 9
@@ -42,6 +45,7 @@ void unlock() {
 }
 
 void setup() {
+    flasher.PinSetup();
     Serial.begin(115200);                         // open a serial connection to your computer, for monitoring
     //pinMode(photoSensorPin, INPUT_PULLUP);        // set card sensor pin to input, with pullup resistor
     myServo.attach(servoMotorPin);                // attaches the servo on pin 9 to the servo object
@@ -49,9 +53,11 @@ void setup() {
 }
 
 void loop() {
+
     bool isCardInserted = cardInserted();        // check if card is inserted
     if (isLocked && isCardInserted) {            // when we are locked and a card insert is detected
         unlock();                                // open the lock
+        flasher.Sequence1();
         openLockTimer.start(unlockTime);         // start a timer
     }
     if (openLockTimer.expired()) {        // after some time
